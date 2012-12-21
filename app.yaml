@@ -1,0 +1,22 @@
+application: randomloadouts
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /images
+  static_dir: images
+
+- url: /.*
+  script: website.app
+
+libraries:
+- name: jinja2
+  version: latest
+
+builtins:
+- appstats: on
