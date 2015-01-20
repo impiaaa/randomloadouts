@@ -61,7 +61,7 @@ def makeCache(weaponNames={}):
             continue
         if "craft_class" in item and item["craft_class"] == "": continue
         if item["item_slot"] in ("head", "misc", "action", "taunt"): continue
-        if item["defindex"] in (160, 161, 169, 221, 264, 266, 294, 297, 298, 423, 433, 452, 457, 466, 474, 482, 513, 572, 574, 587, 608, 609, 638, 727, 739, 741, 851, 863, 880, 933, 939, 947, 1013, 1092, 1100, 1102, 1105, 1121):
+        if item["defindex"] in (160, 161, 169, 221, 264, 266, 294, 297, 298, 423, 433, 452, 457, 466, 474, 482, 513, 572, 574, 587, 608, 609, 638, 727, 739, 741, 851, 863, 880, 933, 939, 947, 1013, 1092, 1100, 1102, 1105, 1121, 1123, 1127, 30474):
             # reskins
             continue
         if item["defindex"] == 850:
@@ -75,6 +75,7 @@ def makeCache(weaponNames={}):
         if item["item_name"][0] == '#':
             itemName = item["item_name"][1:].lower()
             if itemName in weaponNames: newItem["name"] = weaponNames[itemName]
+            else: raise Exception("Unknown translation for %s!"%item["item_name"])
         if newItem["name"].startswith("The "):
             newItem["wiki_url"] = "http://wiki.teamfortress.com/wiki/"+newItem["name"][4:].replace(' ', '_')
         else:
