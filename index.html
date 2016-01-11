@@ -1,11 +1,23 @@
-<!DOCTYPE HTML><html><head><title>Random TF2 Loadouts</title><link rel="stylesheet" type="text/css" href="stylesheets/main.css"></head><body><div id="outercontainer"><h1><a href="/">Random TF2 Loadouts</a></h1><div id="innercontainer" class="{{ classname }}"><div id="classbox">{{ classname }}</div>{% for weapon in items %}<div class="weaponbox"><a href="{{ weapon.wiki_url }}"><img src="{{ weapon.image_url }}" alt="{{ weapon.name }}"><span class="weaponname">{{ weapon.name }}</span></a></div>{% endfor %}</div><script type="text/javascript"><!--
-google_ad_client = "ca-pub-3861713654690965";
-/* Random Loadouts Text Ads */
-google_ad_slot = "0957816096";
-google_ad_width = 728;
-google_ad_height = 90;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script></div><div id="footer">Copyright ©2015 <a href="http://steamcommunity.com/id/impiaaa/">Spencer Alves</a>. <a href="https://github.com/impiaaa/randomloadouts">Source available</a>. Powered by <a href="http://steampowered.com">Steam</a>. Not endorsed or affiliated with Valve or Steam.</div></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random TF2 Loadouts</title>
+    <link href="stylesheets/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div id="outercontainer">
+        <h1><a href="/">Random TF2 Loadouts</a></h1>
+        <div class="{{ classname }}" id="innercontainer">
+            <div id="classbox">
+                {{ classname }}
+            </div>{% for weapon in items %}
+            <div class="weaponbox">
+                <a href="{{ weapon.wiki_url }}"><img alt="{{ weapon.name }}" src="{{ weapon.image_url }}"> <span class="weaponname">{{ weapon.name }}</span></a>
+            </div>{% endfor %}
+        </div>
+    </div>
+    <div id="footer">
+        Copyright ©2016 <a href="http://steamcommunity.com/id/impiaaa/">Spencer Alves</a>. <a href="https://github.com/impiaaa/randomloadouts">Source available</a>. Powered by <a href="http://steampowered.com">Steam</a>. Not endorsed or affiliated with Valve or Steam.
+    </div>
+</body>
+</html>
