@@ -53,53 +53,64 @@ def makeCache(weaponNames={}):
         from urllib2 import urlopen
     else:
         from urllib.request import urlopen
-    urldoc = urlopen("http://api.steampowered.com/IEconItems_440/GetSchema/v0001/?key="+apikey)
-    data = urldoc.read().decode('utf-8')
-    data = json.loads(data)
-    urldoc.close()
+    
     itemDB = {} # organized by class, then loadout slot
     itemCount = 0
-    
-    for item in data["result"]["items"]:
-        if "item_slot" not in item:
-            continue
-        if "craft_class" in item and item["craft_class"] == "": continue
-        if item["item_slot"] in ("head", "misc", "action", "taunt", "quest"): continue
-        if item["defindex"] in (160, 161, 169, 221, 264, 266, 294, 297, 298, 423, 433, 452, 457, 466, 474, 482, 513, 572, 574, 587, 608, 609, 638, 727, 739, 741, 851, 863, 880, 933, 939, 947, 1013, 1092, 1100, 1102, 1105, 1121, 1123, 1127, 30474, 30667, 30666, 30668, 30665):
-            # reskins
-            continue
-        if item["defindex"] == 850:
-            # unavailable
-            continue
-        if "Festive" in item["name"] or "Botkiller" in item["name"] or "Upgradeable" in item["name"] or "Promo" in item["name"]:
-            continue
-        newItem = {"item_slot": item["item_slot"],
-                   "image_url": item["image_url"],
-                   "name": item["name"]}
-        if item["item_name"][0] == '#':
-            itemName = item["item_name"][1:].lower()
-            if itemName in weaponNames: newItem["name"] = weaponNames[itemName]
-            else:
-                sys.stderr.write("Unknown translation for %s!\n"%item["item_name"])
+    start = 0
+
+    while True:
+        urldoc = urlopen("https://api.steampowered.com/IEconItems_440/GetSchemaItems/v0001/?key="+apikey+"&start="+str(start))
+        data = urldoc.read().decode('utf-8')
+        data = json.loads(data)
+        urldoc.close()
+        if len(data["result"]["items"]) == 0:
+            break
+        
+        for item in data["result"]["items"]:
+            if "item_slot" not in item:
                 continue
-        if newItem["name"].startswith("The "):
-            newItem["wiki_url"] = "http://wiki.teamfortress.com/wiki/"+newItem["name"][4:].replace(' ', '_')
-        else:
-            newItem["wiki_url"] = "http://wiki.teamfortress.com/wiki/"+newItem["name"].replace(' ', '_')
-        for klass in item.get("used_by_classes", []):
-            if item["item_slot"] in ("pda", "pda2", "building") and klass == "Engineer": continue
-            if item["item_slot"] == "pda" and klass == "Spy": continue
-            if klass not in itemDB:
-                itemDB[klass] = {}
-            if "per_class_loadout_slots" in item:
-                slot = item["per_class_loadout_slots"][klass]
+            if "craft_class" in item and item["craft_class"] == "" and item["defindex"] not in (1178, 1179, 1180, 1181, 1190): continue
+            if item["item_slot"] in ("head", "misc", "action", "taunt", "quest"): continue
+            if item["defindex"] in (160, 161, 169, 221, 264, 266, 294, 297, 298, 423, 433, 452, 457, 466, 474, 482, 513, 572, 574, 587, 608, 609, 638, 727, 739, 741, 851, 863, 880, 933, 939, 947, 1013, 1092, 1100, 1102, 1105, 1121, 1123, 1127, 30474, 30667, 30666, 30668, 30665):
+                # reskins
+                continue
+            if item["defindex"] == 850:
+                # unavailable
+                continue
+            if "Festive" in item["name"] or "Botkiller" in item["name"] or "Upgradeable" in item["name"] or "Promo" in item["name"]:
+                continue
+            newItem = {"item_slot": item["item_slot"],
+                       "image_url": item["image_url"],
+                       "name": item["name"]}
+            if item["item_name"][0] == '#':
+                itemName = item["item_name"][1:].lower()
+                if itemName in weaponNames: newItem["name"] = weaponNames[itemName]
+                else:
+                    sys.stderr.write("Unknown translation for %s!\n"%item["item_name"])
+                    continue
+            if newItem["name"].startswith("The "):
+                newItem["wiki_url"] = "http://wiki.teamfortress.com/wiki/"+newItem["name"][4:].replace(' ', '_')
             else:
-                slot = item["item_slot"]
-            if slot not in itemDB[klass]:
-                itemDB[klass][slot] = []
-            itemDB[klass][slot].append(newItem)
-            print("Added %s used by %s"%(newItem["name"], klass))
-        itemCount += 1
+                newItem["wiki_url"] = "http://wiki.teamfortress.com/wiki/"+newItem["name"].replace(' ', '_')
+            for klass in item.get("used_by_classes", []):
+                if item["item_slot"] in ("pda", "pda2", "building") and klass == "Engineer": continue
+                if item["item_slot"] == "pda" and klass == "Spy": continue
+                if klass not in itemDB:
+                    itemDB[klass] = {}
+                if "per_class_loadout_slots" in item:
+                    slot = item["per_class_loadout_slots"][klass]
+                else:
+                    slot = item["item_slot"]
+                if slot not in itemDB[klass]:
+                    itemDB[klass][slot] = []
+                itemDB[klass][slot].append(newItem)
+                print("Added %s used by %s"%(newItem["name"], klass))
+            itemCount += 1
+        
+        if "next" in data["result"]:
+            start = data["result"]["next"]
+        else:
+            break
     
     out = open("loadoutDB.p", 'wb')
     pickle.dump(itemDB, out, -1)
